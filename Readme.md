@@ -205,12 +205,12 @@ This project does not use:
 ## Project Structure
 
 ```text
-GLS-Safety-Checklist/
+gls-safety-compliance-checklist/
 │
 ├── index.html
 ├── style.css
 ├── script.js
-├── README.md
+├── Readme.md
 │
 └── assets/
 ```
@@ -290,7 +290,6 @@ When the inspector ends the shift:
 The project can be deployed as a static website on platforms like:
 
 * GitHub Pages
-* Netlify
 * Vercel
 
 ---
@@ -300,7 +299,7 @@ The project can be deployed as a static website on platforms like:
 Submit the following deliverables:
 
 * [GitHub Repository URL](https://github.com/Hemant-Ballia/gls-safety-compliance-checklist)
-* Live Deployment Link
+* [Live Deployment Link](https://gls-safety-compliance-checklist.vercel.app/)
 
 ---
 

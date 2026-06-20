@@ -1,26 +1,26 @@
 // fallback data for offline mode
 
 const FALLBACK_INSPECTORS = [
-  { id: 1, name: "Leanne Graham", username: "Bret", email: "Sincere@april.biz" },
-  { id: 2, name: "Ervin Howell", username: "Antonette", email: "Shanna@melissa.tv" },
-  { id: 3, name: "Clementine Bauch", username: "Samantha", email: "Nathan@yesenia.net" },
-  { id: 4, name: "Patricia Lebsack", username: "Karianne", email: "Julianne.OConner@kory.org" },
-  { id: 5, name: "Chelsey Dietrich", username: "Kamren", email: "Lucio_Hettinger@annie.ca" },
-  { id: 6, name: "Mrs. Dennis Schulist", username: "Leopoldo_Corkery", email: "Karley_Dach@jasper.info" },
-  { id: 7, name: "Kurtis Weissnat", username: "Elwyn.Skiles", email: "Telly.Hoeger@billy.biz" },
-  { id: 8, name: "Nicholas Runolfsdottir V", username: "Maxime_Nienow", email: "Sherwood@rosamond.me" },
-  { id: 9, name: "Glenna Reichert", username: "Delphine", email: "Chaim_McDermott@dana.io" },
-  { id: 10, name: "Clementina DuBuque", username: "Moriah.Stanton", email: "Rey.Padberg@karina.biz" }
+  { id: 1, name: "Amit Kumar", username: "amit.kumar", email: "amit.kumar@gls.local" },
+  { id: 2, name: "Priya Sharma", username: "priya.sharma", email: "priya.sharma@gls.local" },
+  { id: 3, name: "Rahul Verma", username: "rahul.verma", email: "rahul.verma@gls.local" },
+  { id: 4, name: "Neha Singh", username: "neha.singh", email: "neha.singh@gls.local" },
+  { id: 5, name: "Sandeep Yadav", username: "sandeep.yadav", email: "sandeep.yadav@gls.local" },
+  { id: 6, name: "Kavita Mishra", username: "kavita.mishra", email: "kavita.mishra@gls.local" },
+  { id: 7, name: "Rohit Gupta", username: "rohit.gupta", email: "rohit.gupta@gls.local" },
+  { id: 8, name: "Anjali Patel", username: "anjali.patel", email: "anjali.patel@gls.local" },
+  { id: 9, name: "Vikram Chauhan", username: "vikram.chauhan", email: "vikram.chauhan@gls.local" },
+  { id: 10, name: "Meera Joshi", username: "meera.joshi", email: "meera.joshi@gls.local" }
 ];
 
 const FALLBACK_TODOS = [
   { id: 1, title: "Verify safety locks on all loading dock gates.", completed: false },
-  { id: 2, title: "Inspect fire hazard clearance zone in Zone G.", completed: false },
-  { id: 3, title: "Check main forklift emergency stop switches and horn functionality.", completed: false },
-  { id: 4, title: "Examine fire extinguisher pressure gauges in Sector 3.", completed: false },
-  { id: 5, title: "Review emergency exit pathway lighting and clear blockage.", completed: false },
-  { id: 6, title: "Verify overnight hazard log has been reviewed by supervisor.", completed: false },
-  { id: 7, title: "Confirm appropriate PPE wearing compliance at packaging lines.", completed: false }
+  { id: 2, title: "Check forklift emergency stop switch and horn functionality.", completed: false },
+  { id: 3, title: "Inspect fire extinguisher pressure gauges in assigned zone.", completed: false },
+  { id: 4, title: "Ensure emergency exit routes are clear and properly lit.", completed: false },
+  { id: 5, title: "Confirm workers are wearing required PPE near packaging lines.", completed: false },
+  { id: 6, title: "Review overnight hazard log before starting warehouse inspection.", completed: false },
+  { id: 7, title: "Check floor area for oil spills, loose wires, or blocked pathways.", completed: false }
 ];
 
 // localStorage keys
@@ -242,7 +242,11 @@ async function handleStartShift() {
   startShiftBtn.disabled = true;
   startShiftBtn.textContent = "Verifying...";
 
-  let matchedInspector = null;
+  const localInspector = FALLBACK_INSPECTORS.find(
+    (inspector) => inspector.id === badgeIdNumber
+  );
+
+  let badgeFoundInApi = false;
 
   try {
     const response = await fetch("https://jsonplaceholder.typicode.com/users");
@@ -252,13 +256,12 @@ async function handleStartShift() {
     }
 
     const users = await response.json();
-    matchedInspector = users.find((user) => user.id === badgeIdNumber);
+    badgeFoundInApi = users.some((user) => user.id === badgeIdNumber);
   } catch (error) {
-    console.warn("Inspector API unavailable. Using local fallback registry.", error);
-    matchedInspector = FALLBACK_INSPECTORS.find((user) => user.id === badgeIdNumber);
+    console.warn("Inspector API unavailable. Using local inspector registry.", error);
   }
 
-  if (!matchedInspector) {
+  if (!badgeFoundInApi && !localInspector) {
     alert("Invalid Badge ID or Inspector not found.");
     inspectorIdInput.value = "";
     startShiftBtn.disabled = false;
@@ -266,7 +269,15 @@ async function handleStartShift() {
     return;
   }
 
-  currentInspector = matchedInspector;
+  if (!localInspector) {
+    alert("Inspector details not available in local registry.");
+    inspectorIdInput.value = "";
+    startShiftBtn.disabled = false;
+    startShiftBtn.textContent = "Start Shift";
+    return;
+  }
+
+  currentInspector = localInspector;
   saveInspector();
 
   addAuditLog(
@@ -289,8 +300,6 @@ async function handleStartShift() {
 // baseline tasks
 
 async function generateBaselineChecklist() {
-  let baselineTodos = [];
-
   try {
     const response = await fetch("https://jsonplaceholder.typicode.com/todos?_limit=7");
 
@@ -298,17 +307,16 @@ async function generateBaselineChecklist() {
       throw new Error("Baseline task API request failed.");
     }
 
-    baselineTodos = await response.json();
+    await response.json();
   } catch (error) {
-    console.warn("Baseline task API unavailable. Using local fallback checklist.", error);
-    baselineTodos = FALLBACK_TODOS;
+    console.warn("Baseline task API unavailable. Using local safety checklist.", error);
   }
 
   const baseTime = Date.now();
 
-  const baselineTasks = baselineTodos.map((todo, index) => ({
+  const baselineTasks = FALLBACK_TODOS.map((todo, index) => ({
     id: generateTaskId("baseline"),
-    text: capitalizeFirstLetter(todo.title),
+    text: todo.title,
     isCompleted: false,
     timestampCreated: baseTime + index,
     timestampCompleted: null,
@@ -942,14 +950,6 @@ function formatTimeOnly(timestamp) {
   const seconds = String(date.getSeconds()).padStart(2, "0");
 
   return `${hours}:${minutes}:${seconds}`;
-}
-
-function capitalizeFirstLetter(text) {
-  if (!text) {
-    return "";
-  }
-
-  return text.charAt(0).toUpperCase() + text.slice(1);
 }
 
 function escapeHtml(value) {
