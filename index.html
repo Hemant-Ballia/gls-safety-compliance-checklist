@@ -1,0 +1,252 @@
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GLS Operational Readiness Module - Safety & Compliance Sub-System</title>
+  <link rel="stylesheet" href="./style.css" />
+</head>
+
+<body>
+  <header class="app-header">
+    <div class="logo-container">
+      <div class="logo-icon" aria-hidden="true">▲</div>
+
+      <div class="logo-text">
+        <h1>GLS Operational Readiness</h1>
+        <span class="sub-logo">Safety &amp; Compliance Sub-System</span>
+      </div>
+    </div>
+
+    <div class="session-header-status">
+      <div
+        id="currentInspectorDisplay"
+        class="inspector-badge-display"
+        aria-live="polite"
+      >
+        <span class="status-offline">● SHIFT INACTIVE</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="dashboard-grid">
+    <aside class="sidebar">
+      <section class="card" id="sessionSec">
+        <h2 class="card-title">Inspector Session</h2>
+
+        <p class="card-desc">
+          Enter your unique badge ID provided by GLS Operations to begin compliance checks.
+        </p>
+
+        <div class="session-form-group">
+          <label for="inspectorIdInput" class="form-label">Badge ID</label>
+
+          <div class="input-with-button">
+            <input
+              type="text"
+              id="inspectorIdInput"
+              placeholder="Enter Badge ID"
+              autocomplete="off"
+              required
+            />
+
+            <button id="startShiftBtn" class="btn btn-primary" type="button">
+              Start Shift
+            </button>
+          </div>
+
+          <p class="form-help">
+            Use a badge ID between 1 and 10 for this demo inspector lookup.
+          </p>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="global-actions">
+          <button
+            id="exportTasksBtn"
+            class="btn btn-secondary btn-full"
+            type="button"
+            disabled
+          >
+            <span class="btn-icon" aria-hidden="true">⬇</span>
+            Download Current Report
+          </button>
+
+          <button
+            id="endShiftBtn"
+            class="btn btn-danger btn-full"
+            type="button"
+            disabled
+          >
+            <span class="btn-icon" aria-hidden="true">⚠</span>
+            End Shift &amp; Export Data
+          </button>
+        </div>
+      </section>
+
+      <section class="card flex-grow">
+        <h2 class="card-title">Live Audit Trail</h2>
+
+        <p class="card-desc">
+          Every important shift action is recorded locally for compliance review.
+        </p>
+
+        <div class="audit-log-container">
+          <ul id="auditLogList" class="audit-log-list">
+            <li class="audit-placeholder">No active session logs found.</li>
+          </ul>
+        </div>
+      </section>
+    </aside>
+
+    <section class="main-content">
+      <article class="card form-card">
+        <h2 class="card-title">New Hazard or Compliance Check</h2>
+
+        <p class="card-desc">
+          Document warehouse condition discrepancies or pre-emptive safety tasks.
+        </p>
+
+        <form id="taskCreatorForm" class="task-form-grid">
+          <div class="form-group span-full">
+            <label for="newTaskTextInput" class="form-label">
+              Compliance / Safety Task Description
+            </label>
+
+            <input
+              type="text"
+              id="newTaskTextInput"
+              placeholder="Describe New Safety Task"
+              autocomplete="off"
+              disabled
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="newTaskPrioritySelect" class="form-label">Priority</label>
+
+            <select id="newTaskPrioritySelect" class="form-select" disabled>
+              <option value="High">High</option>
+              <option value="Medium" selected>Medium</option>
+              <option value="Low">Low</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="newTaskCategorySelect" class="form-label">Category</label>
+
+            <select id="newTaskCategorySelect" class="form-select" disabled>
+              <option value="Equipment Check" selected>Equipment Check</option>
+              <option value="Environmental Scan">Environmental Scan</option>
+              <option value="Protocol Adherence">Protocol Adherence</option>
+              <option value="Emergency Prep">Emergency Prep</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+
+          <div class="form-action span-full">
+            <button
+              id="addTaskBtn"
+              class="btn btn-primary-accent btn-full"
+              type="submit"
+              disabled
+            >
+              Add Task
+            </button>
+          </div>
+        </form>
+      </article>
+
+      <article class="card list-card">
+        <div class="list-card-header">
+          <div>
+            <h2 class="card-title">Active Safety Checklist</h2>
+
+            <p class="card-desc">
+              Complete, edit, filter, sort, or delete safety checklist tasks.
+            </p>
+          </div>
+
+          <div id="checklistStats" class="checklist-summary">
+            <span class="stat-badge">
+              Pending: <strong id="pendingCount">0</strong>
+            </span>
+
+            <span class="stat-badge text-green">
+              Completed: <strong id="completedCount">0</strong>
+            </span>
+          </div>
+        </div>
+
+        <div class="controls-container">
+          <div class="control-box">
+            <label for="filterStatus" class="control-label">Status</label>
+
+            <select id="filterStatus" class="form-select select-sm" disabled>
+              <option value="All">All</option>
+              <option value="Pending">Pending</option>
+              <option value="Completed">Completed</option>
+            </select>
+          </div>
+
+          <div class="control-box">
+            <label for="filterCategory" class="control-label">Category</label>
+
+            <select id="filterCategory" class="form-select select-sm" disabled>
+              <option value="All">All</option>
+              <option value="Equipment Check">Equipment Check</option>
+              <option value="Environmental Scan">Environmental Scan</option>
+              <option value="Protocol Adherence">Protocol Adherence</option>
+              <option value="Emergency Prep">Emergency Prep</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+
+          <div class="control-box">
+            <label for="filterPriority" class="control-label">Priority</label>
+
+            <select id="filterPriority" class="form-select select-sm" disabled>
+              <option value="All">All</option>
+              <option value="High">High</option>
+              <option value="Medium">Medium</option>
+              <option value="Low">Low</option>
+            </select>
+          </div>
+
+          <div class="control-box">
+            <label for="sortOption" class="control-label">Sort By</label>
+
+            <select id="sortOption" class="form-select select-sm" disabled>
+              <option value="PriorityDesc" selected>Priority High to Low</option>
+              <option value="DateAsc">Creation Date Asc</option>
+              <option value="DateDesc">Creation Date Desc</option>
+              <option value="PendingFirst">Completion Status Pending First</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="checklist-wrapper">
+          <ul id="checklist" class="checklist-list">
+            <li class="checklist-notice-item">
+              <span class="notice-icon" aria-hidden="true">🔐</span>
+              <p>Please start your shift to view and manage safety tasks.</p>
+            </li>
+          </ul>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <footer class="app-footer">
+    <p>
+      © 2026 Global Logistics Solutions. Safety and compliance checklist runs locally in this browser.
+    </p>
+  </footer>
+
+  <script src="./script.js" defer></script>
+</body>
+</html>
